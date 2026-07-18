@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  knots:
+    image: ghcr.io/andygodish/bitcoin-knots:v29.3.knots20260508-1
+    container_name: personal-node-knots
+    restart: unless-stopped
+    volumes:
+      - bitcoin_data_dir:/home/bitcoin/.bitcoin
+    ports:
+      - "8333:8333"
+      - "127.0.0.1:8332:8332"
+    command:
+      - -server=1
+      - -txindex=1
+      - -printtoconsole=1
+      - -rpcallowip=172.16.0.0/12  # Authorizes internal docker-compose bridge queries
+      - -rpcbind=0.0.0.0
+
+  electrs:
+    image: ghcr.io/andygodish/electrs:v0.11.1-2
+    container_name: personal-node-electrs
+    restart: unless-stopped
+    user: "10002:10002"
+    depends_on:
+      - knots
+    volumes:
+      # Mount the Knots data folder into Electrs as Read-Only to read the cookie file
+      - bitcoin_data_dir:/bitcoin-data:ro 
+      - electrs_index_dir:/db
+    ports:
+      - "50001:50001"
+    command:
+      - --log-filters=INFO
+      - --network=bitcoin
+      - --daemon-rpc-addr=knots:8332
+      - --daemon-p2p-addr=knots:8333
+      - --daemon-dir=/bitcoin-data
+      - --cookie-file=/bitcoin-data/.cookie
+      - --db-dir=/db
+      - --electrum-rpc-addr=0.0.0.0:50001
+
+volumes:
+  bitcoin_data_dir:
+    external: true
+  electrs_index_dir:
+    external: true
