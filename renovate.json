@@ -8,18 +8,16 @@
   },
   "hostRules": [
     {
-      "hostType": "docker",
       "matchHost": "ghcr.io",
+      "hostType": "docker",
       "username": "",
       "password": ""
     }
   ],
   "packageRules": [
     {
-      "matchPackageNames": [
-        "ghcr.io/andygodish/electrs", 
-        "ghcr.io/andygodish/bitcoin-knots"
-      ],
+      "matchDatasources": ["docker"],
+      "matchPackagePrefixes": ["ghcr.io/andygodish/"],
       "enabled": true
     }
   ]
