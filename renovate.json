@@ -10,7 +10,7 @@
     {
       "matchDatasources": ["docker"],
       "matchPackagePrefixes": ["ghcr.io/andygodish/"],
-      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<build>\\d+)$"
+      "versioning": "loose"
     }
   ]
 }
