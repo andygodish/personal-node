@@ -8,10 +8,9 @@
   },
   "hostRules": [
     {
-      "matchHost": "ghcr.io",
       "hostType": "docker",
-      "username": "anonymous",
-      "password": "none"
+      "matchHost": "ghcr.io",
+      "token": "{{ secrets.GHCR_READ_TOKEN }}"
     }
   ],
   "packageRules": [
