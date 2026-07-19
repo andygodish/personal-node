@@ -6,19 +6,11 @@
   "docker-compose": {
     "fileMatch": ["(^|/)docker-compose\\.yaml$"]
   },
-  "hostRules": [
-    {
-      "hostType": "docker",
-      "matchHost": "ghcr.io",
-      "username": "andygodish",
-      "password": "{{ secrets.GHCR_READ_TOKEN }}"
-    }
-  ],
   "packageRules": [
     {
       "matchDatasources": ["docker"],
       "matchPackagePrefixes": ["ghcr.io/andygodish/"],
-      "enabled": true
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<build>\\d+)$"
     }
   ]
 }
