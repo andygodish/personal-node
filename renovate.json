@@ -6,13 +6,18 @@
   "docker-compose": {
     "fileMatch": ["(^|/)docker-compose\\.yaml$"]
   },
+  "hostRules": [
+    {
+      "matchHost": "ghcr.io",
+      "hostType": "docker"
+    }
+  ],
   "packageRules": [
     {
       "matchPackageNames": [
         "ghcr.io/andygodish/electrs", 
         "ghcr.io/andygodish/bitcoin-knots"
       ],
-      "registryUrls": ["https://ghcr.io"],
       "enabled": true
     }
   ]
