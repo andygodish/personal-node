@@ -10,7 +10,8 @@
     {
       "hostType": "docker",
       "matchHost": "ghcr.io",
-      "token": "{{ secrets.GHCR_READ_TOKEN }}"
+      "username": "andygodish",
+      "password": "{{ secrets.GHCR_READ_TOKEN }}"
     }
   ],
   "packageRules": [
