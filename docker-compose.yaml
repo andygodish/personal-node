@@ -1,6 +1,7 @@
 services:
   knots:
     image: ghcr.io/andygodish/bitcoin-knots:v29.3.knots20260508-1
+    stop_grace_period: 10m  # Tells Docker to wait up to 10 minutes before executing a SIGKILL
     container_name: personal-node-knots
     restart: unless-stopped
     volumes:
