@@ -10,8 +10,8 @@
     {
       "matchHost": "ghcr.io",
       "hostType": "docker",
-      "username": "",
-      "password": ""
+      "username": "anonymous",
+      "password": "none"
     }
   ],
   "packageRules": [
