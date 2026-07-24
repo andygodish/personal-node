@@ -20,7 +20,7 @@ services:
     pull_policy: always
     container_name: personal-node-electrs
     restart: unless-stopped
-    user: "10002:10002"
+    user: "10002:10001" # <--- Added group 10001 (Knots group)
     depends_on:
       - knots
     volumes:

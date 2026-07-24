@@ -34,8 +34,8 @@ fix-permissions:
 	@echo "Checking and setting volume directory ownership for non-root containers..."
 	@docker volume create $(BITCOIN_VOL) >/dev/null 2>&1 || true
 	@docker volume create $(ELECTRS_VOL) >/dev/null 2>&1 || true
-	@docker run --rm -v $(BITCOIN_VOL):/data alpine sh -c "chown -R 10001:10001 /data && chmod 755 /data && [ -f /data/.cookie ] && chmod 644 /data/.cookie || true" >/dev/null 2>&1 || true
-	@docker run --rm -v $(ELECTRS_VOL):/data alpine sh -c "chown -R 10002:10002 /data && chmod 755 /data" >/dev/null 2>&1 || true
+	@docker run --rm -v $(BITCOIN_VOL):/data alpine sh -c "chown -R 10001:10001 /data && chmod -R 775 /data" >/dev/null 2>&1 || true
+	@docker run --rm -v $(ELECTRS_VOL):/data alpine sh -c "chown -R 10002:10002 /data && chmod -R 775 /data" >/dev/null 2>&1 || true
 
 up: verify-ports fix-permissions
 	@echo "Checking infrastructure state and applying configuration..."
