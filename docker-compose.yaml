@@ -40,6 +40,4 @@ services:
 
 volumes:
   bitcoin_data_dir:
-    external: true
   electrs_index_dir:
-    external: true
