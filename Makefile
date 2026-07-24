@@ -8,7 +8,7 @@ P2P_PORT := 8333
 RPC_PORT := 8332
 ELECTRUM_PORT := 50001
 
-.PHONY: help up down restart logs status ps verify-ports fix-permissions
+.PHONY: help up down restart logs status ps verify-ports fix-permissions sync-cookie-perms
 
 help:
 	@echo "Personal Node Makefile"
@@ -34,12 +34,24 @@ fix-permissions:
 	@echo "Checking and setting volume directory ownership for non-root containers..."
 	@docker volume create $(BITCOIN_VOL) >/dev/null 2>&1 || true
 	@docker volume create $(ELECTRS_VOL) >/dev/null 2>&1 || true
-	@docker run --rm -v $(BITCOIN_VOL):/data alpine sh -c "chown -R 10001:10001 /data && chmod -R 775 /data" >/dev/null 2>&1 || true
-	@docker run --rm -v $(ELECTRS_VOL):/data alpine sh -c "chown -R 10002:10002 /data && chmod -R 775 /data" >/dev/null 2>&1 || true
+	@docker run --rm -v $(BITCOIN_VOL):/data alpine sh -c "chown -R 10001:10001 /data && chmod 755 /data" >/dev/null 2>&1 || true
+	@docker run --rm -v $(ELECTRS_VOL):/data alpine sh -c "chown -R 10002:10002 /data && chmod 755 /data" >/dev/null 2>&1 || true
+
+sync-cookie-perms:
+	@echo "Waiting for Knots to initialize auth cookie..."
+	@for i in $$(seq 1 30); do \
+		if docker run --rm -v $(BITCOIN_VOL):/data alpine test -f /data/.cookie 2>/dev/null; then \
+			docker run --rm -v $(BITCOIN_VOL):/data alpine chmod 644 /data/.cookie >/dev/null 2>&1; \
+			echo "Auth cookie readable by electrs."; \
+			break; \
+		fi; \
+		sleep 1; \
+	done
 
 up: verify-ports fix-permissions
 	@echo "Checking infrastructure state and applying configuration..."
 	docker compose -f $(COMPOSE_FILE) up -d --remove-orphans
+	@$(MAKE) sync-cookie-perms
 	@echo "Stack is running. Run 'make status' to verify health."
 
 down:
@@ -49,6 +61,7 @@ down:
 restart:
 	@echo "Gracefully restarting node stack..."
 	docker compose -f $(COMPOSE_FILE) restart
+	@$(MAKE) sync-cookie-perms
 
 logs:
 	docker compose -f $(COMPOSE_FILE) logs -f --tail=100
