@@ -28,7 +28,14 @@ verify-ports:
 	done
 	@echo "All target network ports are clear."
 
-up: verify-ports
+fix-permissions:
+	@echo "Checking and setting volume directory ownership for non-root containers..."
+	@docker volume create bitcoin_data_dir >/dev/null 2>&1 || true
+	@docker volume create electrs_index_dir >/dev/null 2>&1 || true
+	@docker run --rm -v bitcoin_data_dir:/data alpine chown -R 1000:1000 /data >/dev/null 2>&1 || true
+	@docker run --rm -v electrs_index_dir:/data alpine chown -R 10002:10002 /data >/dev/null 2>&1 || true
+
+up: verify-ports fix-permissions
 	@echo "Checking infrastructure state and applying configuration..."
 	docker compose -f $(COMPOSE_FILE) up -d --remove-orphans
 	@echo "Stack is running. Run 'make status' to verify health."
