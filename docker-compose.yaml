@@ -10,10 +10,6 @@ services:
     ports:
       - "8333:8333"
       - "127.0.0.1:8332:8332"
-    command:
-      - -server=1
-      - -txindex=1
-      - -printtoconsole=1
 
   electrs:
     image: ghcr.io/andygodish/electrs:v0.11.1-2
