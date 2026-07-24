@@ -40,4 +40,6 @@ services:
 
 volumes:
   bitcoin_data_dir:
+    name: bitcoin_data_dir # <-- Removes the project name prefix (personal-node_bitcoin_data_dir)
   electrs_index_dir:
+    name: electrs_index_dir

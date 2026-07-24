@@ -1,12 +1,14 @@
 # Variables
 COMPOSE_FILE := $(shell test -f docker-compose.yaml && echo docker-compose.yaml || echo docker-compose.yml)
+BITCOIN_VOL := bitcoin_data_dir
+ELECTRS_VOL := electrs_index_dir
 
 # Ports to check before spinning up infrastructure
 P2P_PORT := 8333
 RPC_PORT := 8332
 ELECTRUM_PORT := 50001
 
-.PHONY: help up down restart logs status ps verify-ports
+.PHONY: help up down restart logs status ps verify-ports fix-permissions
 
 help:
 	@echo "Personal Node Makefile"
@@ -30,10 +32,10 @@ verify-ports:
 
 fix-permissions:
 	@echo "Checking and setting volume directory ownership for non-root containers..."
-	@docker volume create bitcoin_data_dir >/dev/null 2>&1 || true
-	@docker volume create electrs_index_dir >/dev/null 2>&1 || true
-	@docker run --rm -v bitcoin_data_dir:/data alpine chown -R 1000:1000 /data >/dev/null 2>&1 || true
-	@docker run --rm -v electrs_index_dir:/data alpine chown -R 10002:10002 /data >/dev/null 2>&1 || true
+	@docker volume create $(BITCOIN_VOL) >/dev/null 2>&1 || true
+	@docker volume create $(ELECTRS_VOL) >/dev/null 2>&1 || true
+	@docker run --rm -v $(BITCOIN_VOL):/data alpine chown -R 1000:1000 /data >/dev/null 2>&1 || true
+	@docker run --rm -v $(ELECTRS_VOL):/data alpine chown -R 10002:10002 /data >/dev/null 2>&1 || true
 
 up: verify-ports fix-permissions
 	@echo "Checking infrastructure state and applying configuration..."
