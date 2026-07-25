@@ -24,15 +24,6 @@ services:
       - electrs_index_dir:/db
     ports:
       - "50001:50001"
-    command:
-      - --log-filters=INFO
-      - --network=bitcoin
-      - --daemon-rpc-addr=knots:8332
-      - --daemon-p2p-addr=knots:8333
-      - --daemon-dir=/bitcoin-data
-      - --cookie-file=/bitcoin-data/.cookie
-      - --db-dir=/db
-      - --electrum-rpc-addr=0.0.0.0:50001
 
 volumes:
   bitcoin_data_dir:
