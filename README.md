@@ -1,6 +1,6 @@
 # Personal Node
 
-Run a containerized Bitcoin node and Electrum server. 
+Run a containerized Bitcoin node and Electrum server.
 
 ## Configuration
 
