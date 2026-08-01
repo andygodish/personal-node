@@ -26,7 +26,7 @@ services:
       - "50001:50001"
 
   tor:
-    image: ${TOR_IMAGE:-tor:v0.4.9.11-0_deb13u1-0}
+    image: ghcr.io/andygodish/tor:v0.4.9.11-0_deb13u1-0
     pull_policy: never
     container_name: personal-node-tor
     restart: unless-stopped
