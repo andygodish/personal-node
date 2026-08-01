@@ -2,13 +2,15 @@
 COMPOSE_FILE := $(shell test -f docker-compose.yaml && echo docker-compose.yaml || echo docker-compose.yml)
 BITCOIN_VOL := bitcoin_data_dir
 ELECTRS_VOL := electrs_index_dir
+TOR_VOL := tor_data_dir
 
 # Ports to check before spinning up infrastructure
 P2P_PORT := 8333
 RPC_PORT := 8332
 ELECTRUM_PORT := 50001
+TOR_SOCKS_PORT := 9050
 
-.PHONY: help up down restart logs status ps verify-ports fix-permissions sync-cookie-perms
+.PHONY: help up down restart logs status ps verify-ports fix-permissions sync-cookie-perms tor-hostname
 
 help:
 	@echo "Personal Node Makefile"
@@ -17,11 +19,12 @@ help:
 	@echo "make down    - Safely stop and remove containers (keeps volumes intact)"
 	@echo "make restart - Gracefully restart all node services"
 	@echo "make logs    - Stream live container orchestration logs"
-	@echo "make status  - View operational health and port bindings"
+	@echo "make status       - View operational health and port bindings"
+	@echo "make tor-hostname - Print the Bitcoin P2P onion hostname after Tor initializes"
 
 verify-ports:
 	@echo "Running preflight network checks..."
-	@for port in $(P2P_PORT) $(RPC_PORT) $(ELECTRUM_PORT); do \
+	@for port in $(P2P_PORT) $(RPC_PORT) $(ELECTRUM_PORT) $(TOR_SOCKS_PORT); do \
 		if lsof -Pi :$$port -sTCP:LISTEN -t >/dev/null 2>&1; then \
 			echo "ERROR: Port $$port is already occupied on the host system."; \
 			echo "Please stop the conflicting service before running the node."; \
@@ -34,8 +37,10 @@ fix-permissions:
 	@echo "Checking and setting volume directory ownership for non-root containers..."
 	@docker volume create $(BITCOIN_VOL) >/dev/null 2>&1 || true
 	@docker volume create $(ELECTRS_VOL) >/dev/null 2>&1 || true
+	@docker volume create $(TOR_VOL) >/dev/null 2>&1 || true
 	@docker run --rm -v $(BITCOIN_VOL):/data alpine sh -c "chown -R 10001:10001 /data && chmod 755 /data" >/dev/null 2>&1 || true
 	@docker run --rm -v $(ELECTRS_VOL):/data alpine sh -c "chown -R 10002:10002 /data && chmod 755 /data" >/dev/null 2>&1 || true
+	@docker run --rm -v $(TOR_VOL):/data alpine sh -c "chown -R 10003:10003 /data && chmod 700 /data" >/dev/null 2>&1 || true
 
 sync-cookie-perms:
 	@echo "Waiting for Knots to initialize auth cookie..."
@@ -68,3 +73,6 @@ logs:
 
 status ps:
 	docker compose -f $(COMPOSE_FILE) ps
+
+tor-hostname:
+	@docker run --rm -v $(TOR_VOL):/data alpine sh -c 'cat /data/knots-p2p/hostname 2>/dev/null || echo "Tor hostname is not available yet. Start the stack and wait for Tor to initialize."'
