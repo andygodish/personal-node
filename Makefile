@@ -1,5 +1,6 @@
 # Variables
 COMPOSE_FILE := $(shell test -f docker-compose.yaml && echo docker-compose.yaml || echo docker-compose.yml)
+BITCOIN_CONF_COMPOSE_FILE := docker-compose.bitcoin-conf.yaml
 BITCOIN_VOL := bitcoin_data_dir
 ELECTRS_VOL := electrs_index_dir
 TOR_VOL := tor_data_dir
@@ -10,12 +11,13 @@ RPC_PORT := 8332
 ELECTRUM_PORT := 50001
 TOR_SOCKS_PORT := 9050
 
-.PHONY: help up down restart logs status ps verify-ports fix-permissions sync-cookie-perms tor-hostname
+.PHONY: help up up-bootstrap-onion down restart logs status ps verify-ports fix-permissions sync-cookie-perms tor-hostname
 
 help:
 	@echo "Personal Node Makefile"
 	@echo "----------------------------"
-	@echo "make up      - Idempotently spin up or update the node stack (includes preflight checks)"
+	@echo "make up              - Run the steady-state node stack with node-local bitcoin.conf"
+	@echo "make up-bootstrap-onion - First-run stack without bitcoin.conf to generate a Tor onion hostname"
 	@echo "make down    - Safely stop and remove containers (keeps volumes intact)"
 	@echo "make restart - Gracefully restart all node services"
 	@echo "make logs    - Stream live container orchestration logs"
@@ -53,11 +55,18 @@ sync-cookie-perms:
 		sleep 1; \
 	done
 
-up: verify-ports fix-permissions
-	@echo "Checking infrastructure state and applying configuration..."
+up: fix-permissions
+	@test -f bitcoin.conf || (echo "ERROR: bitcoin.conf is missing. For first-time onion generation, run 'make up-bootstrap-onion'. Then copy bitcoin.conf.example to bitcoin.conf and set externalip."; exit 1)
+	@echo "Running steady-state node stack with node-local bitcoin.conf..."
+	docker compose -f $(COMPOSE_FILE) -f $(BITCOIN_CONF_COMPOSE_FILE) up -d --remove-orphans
+	@$(MAKE) sync-cookie-perms
+	@echo "Stack is running with the node-local bitcoin.conf override. Run 'make status' to verify health."
+
+up-bootstrap-onion: verify-ports fix-permissions
+	@echo "Starting first-run stack without bitcoin.conf to generate a Tor onion hostname..."
 	docker compose -f $(COMPOSE_FILE) up -d --remove-orphans
 	@$(MAKE) sync-cookie-perms
-	@echo "Stack is running. Run 'make status' to verify health."
+	@echo "Bootstrap stack is running. Run 'make tor-hostname' after Tor initializes."
 
 down:
 	@echo "Safely bringing down containers..."

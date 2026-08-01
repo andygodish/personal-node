@@ -14,10 +14,10 @@ make build
 cd ../personal-node
 ```
 
-Start the stack:
+Start the bootstrap stack without a node-local `bitcoin.conf` override:
 
 ```bash
-make up
+make up-bootstrap-onion
 ```
 
 Tor should generate the onion service hostname shortly after the Tor container starts. Knots can still be syncing blocks while this happens. Print the hostname with:
@@ -32,41 +32,27 @@ At this point, the node is reachable through that onion address for inbound Bitc
 
 ## Second Run: Advertise the Onion Address
 
-The first run makes the onion address exist. To make Knots advertise that onion address as one of its local reachable addresses, create a `bitcoin.conf` override in the root of this project.
+The first run makes the onion address exist. To make Knots advertise that onion address as one of its local reachable addresses, create a node-local `bitcoin.conf` override from the committed example:
 
-Start with the image defaults from `../image-knots/bitcoin.conf`, then add the generated onion address:
+```bash
+cp bitcoin.conf.example bitcoin.conf
+```
+
+Edit `bitcoin.conf`, uncomment `externalip`, and replace the placeholder with the generated onion hostname:
 
 ```conf
 externalip=<your-generated-onion-hostname>
-listen=1
 ```
 
-For example:
+The example preserves the baked image defaults, including `listen=1`. The real `bitcoin.conf` is ignored by Git because it contains machine-local node configuration.
 
-```conf
-externalip=exampleexampleexampleexampleexampleexampleexampleexampleexampleexample.onion
-listen=1
-```
-
-Mount the override using the pattern in [configure-knots.md](configure-knots.md):
-
-```yaml
-services:
-  knots:
-    configs:
-      - source: custom_bitcoin_conf
-        target: /home/bitcoin/.bitcoin/bitcoin.conf
-
-configs:
-  custom_bitcoin_conf:
-    file: ./bitcoin.conf
-```
-
-Restart the stack after adding the override:
+Start the steady-state stack with the node-local config override:
 
 ```bash
-make restart
+make up
 ```
+
+After this point, `make up` is the normal command for subsequent starts and updates.
 
 You can verify Knots sees the onion address with `getnetworkinfo`; the address should appear under `localaddresses` after Knots starts with the override.
 
