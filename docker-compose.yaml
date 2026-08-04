@@ -7,6 +7,11 @@ services:
     restart: unless-stopped
     volumes:
       - bitcoin_data_dir:/home/bitcoin/.bitcoin
+    networks:
+      default:
+        aliases:
+          - knots
+          - personal-node-knots
     ports:
       - "8333:8333"
       - "127.0.0.1:8332:8332"
@@ -32,6 +37,9 @@ services:
     restart: unless-stopped
     depends_on:
       - knots
+    environment:
+      KNOTS_SERVICE_HOST: knots
+      KNOTS_SERVICE_PORT: "8333"
     volumes:
       - tor_data_dir:/var/lib/tor
     ports:
