@@ -1,0 +1,9 @@
+services:
+  knots:
+    configs:
+      - source: custom_bitcoin_conf
+        target: /home/bitcoin/.bitcoin/bitcoin.conf
+
+configs:
+  custom_bitcoin_conf:
+    file: ./bitcoin.conf

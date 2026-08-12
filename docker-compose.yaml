@@ -7,6 +7,11 @@ services:
     restart: unless-stopped
     volumes:
       - bitcoin_data_dir:/home/bitcoin/.bitcoin
+    networks:
+      default:
+        aliases:
+          - knots
+          - personal-node-knots
     ports:
       - "8333:8333"
       - "127.0.0.1:8332:8332"
@@ -20,13 +25,30 @@ services:
     depends_on:
       - knots
     volumes:
-      - bitcoin_data_dir:/bitcoin-data:ro 
+      - bitcoin_data_dir:/bitcoin-data:ro
       - electrs_index_dir:/db
     ports:
       - "50001:50001"
+
+  tor:
+    image: ghcr.io/andygodish/tor:v0.4.9.11-0_deb13u1-0
+    pull_policy: never
+    container_name: personal-node-tor
+    restart: unless-stopped
+    depends_on:
+      - knots
+    environment:
+      KNOTS_SERVICE_HOST: knots
+      KNOTS_SERVICE_PORT: "8333"
+    volumes:
+      - tor_data_dir:/var/lib/tor
+    ports:
+      - "127.0.0.1:9050:9050"
 
 volumes:
   bitcoin_data_dir:
     name: bitcoin_data_dir # <-- Removes the project name prefix (personal-node_bitcoin_data_dir)
   electrs_index_dir:
     name: electrs_index_dir
+  tor_data_dir:
+    name: tor_data_dir
