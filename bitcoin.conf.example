@@ -25,13 +25,10 @@ txindex=1
 # Disable block pruning — MANDATORY for full node indexing & electrs
 prune=0
 
-# Confirm Knots soft-fork / protocol rules (prevents periodic log warnings)
-consensusrules=rdts
-
 # ==============================================================================
 # Performance & Resources
 # ==============================================================================
-# Allocate 2GB for database caching during sync (Knots auto-scales if RAM allows)
+# Allocate 2GB for database caching during sync (Core auto-scales if RAM allows)
 dbcache=2048
 
 # Reduce disk write frequency for raw block data

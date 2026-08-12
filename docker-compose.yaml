@@ -1,17 +1,20 @@
 services:
-  knots:
-    image: ghcr.io/andygodish/bitcoin-knots:v29.4.knots20260508-0
+  core:
+    image: ghcr.io/andygodish/bitcoin-core:v31.1-0
     stop_grace_period: 10m  # Tells Docker to wait up to 10 minutes before executing a SIGKILL
     pull_policy: always
-    container_name: personal-node-knots
+    container_name: personal-node-core
     restart: unless-stopped
+    command:
+      - -datadir=/home/bitcoin/.bitcoin
+      - -printtoconsole=1
     volumes:
       - bitcoin_data_dir:/home/bitcoin/.bitcoin
     networks:
       default:
         aliases:
-          - knots
-          - personal-node-knots
+          - core
+          - personal-node-core
     ports:
       - "8333:8333"
       - "127.0.0.1:8332:8332"
@@ -21,9 +24,9 @@ services:
     pull_policy: always
     container_name: personal-node-electrs
     restart: unless-stopped
-    user: "10002:10001" # <--- Added group 10001 (Knots group)
+    user: "10002:10001"
     depends_on:
-      - knots
+      - core
     volumes:
       - bitcoin_data_dir:/bitcoin-data:ro
       - electrs_index_dir:/db
@@ -36,9 +39,9 @@ services:
     container_name: personal-node-tor
     restart: unless-stopped
     depends_on:
-      - knots
+      - core
     environment:
-      KNOTS_SERVICE_HOST: knots
+      KNOTS_SERVICE_HOST: core
       KNOTS_SERVICE_PORT: "8333"
     volumes:
       - tor_data_dir:/var/lib/tor
@@ -47,8 +50,5 @@ services:
 
 volumes:
   bitcoin_data_dir:
-    name: bitcoin_data_dir # <-- Removes the project name prefix (personal-node_bitcoin_data_dir)
   electrs_index_dir:
-    name: electrs_index_dir
   tor_data_dir:
-    name: tor_data_dir

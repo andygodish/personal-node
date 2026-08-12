@@ -1,5 +1,5 @@
 services:
-  knots:
+  core:
     configs:
       - source: custom_bitcoin_conf
         target: /home/bitcoin/.bitcoin/bitcoin.conf

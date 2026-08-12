@@ -1,6 +1,6 @@
-# Knots Configuration (`bitcoin.conf`)
+# Core Configuration (`bitcoin.conf`)
 
-To pass a custom configuration file (`bitcoin.conf`) to the Bitcoin Knots container, you can mount it into the container at runtime. 
+To pass a custom configuration file (`bitcoin.conf`) to the Bitcoin Core container, you can mount it into the container at runtime. 
 
 1. Create a custom `bitcoin.conf` file on your host machine in the root of this project directory and add your desired configuration options.
 
@@ -14,13 +14,13 @@ configs:
     file: ./bitcoin.conf
 ```
 
-3. Update the `knots` service in the `docker-compose.yaml` file to use the custom configuration under the `configs` section:
+3. Update the `core` service in the `docker-compose.yaml` file to use the custom configuration under the `configs` section:
 
 ```yaml
 # docker-compose.yaml
 
 services:
-  knots:
+  core:
     ...
     configs:
       - source: custom_bitcoin_conf

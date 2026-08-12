@@ -45,7 +45,7 @@ fix-permissions:
 	@docker run --rm -v $(TOR_VOL):/data alpine sh -c "chown -R 10003:10003 /data && chmod 700 /data" >/dev/null 2>&1 || true
 
 sync-cookie-perms:
-	@echo "Waiting for Knots to initialize auth cookie..."
+	@echo "Waiting for Bitcoin Core to initialize auth cookie..."
 	@for i in $$(seq 1 30); do \
 		if docker run --rm -v $(BITCOIN_VOL):/data alpine test -f /data/.cookie 2>/dev/null; then \
 			docker run --rm -v $(BITCOIN_VOL):/data alpine chmod 644 /data/.cookie >/dev/null 2>&1; \
