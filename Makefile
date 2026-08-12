@@ -1,9 +1,9 @@
 # Variables
 COMPOSE_FILE := $(shell test -f docker-compose.yaml && echo docker-compose.yaml || echo docker-compose.yml)
 BITCOIN_CONF_COMPOSE_FILE := docker-compose.bitcoin-conf.yaml
-BITCOIN_VOL := bitcoin_data_dir
-ELECTRS_VOL := electrs_index_dir
-TOR_VOL := tor_data_dir
+BITCOIN_VOL := personal-node_bitcoin_data_dir
+ELECTRS_VOL := personal-node_electrs_index_dir
+TOR_VOL := personal-node_tor_data_dir
 
 # Ports to check before spinning up infrastructure
 P2P_PORT := 8333
