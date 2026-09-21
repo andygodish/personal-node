@@ -1,6 +1,6 @@
 services:
   core:
-    image: ghcr.io/andygodish/bitcoin-core:v31.1-0
+    image: ghcr.io/andygodish/bitcoin-core:v31.1-1
     stop_grace_period: 10m  # Tells Docker to wait up to 10 minutes before executing a SIGKILL
     pull_policy: always
     container_name: personal-node-core
